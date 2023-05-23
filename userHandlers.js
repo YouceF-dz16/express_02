@@ -29,8 +29,25 @@ const getUsers = (req, res) => {
         res.status(500).send("Error retrieving data from database");
       });
   };
+  const postUser = (req, res) => {
+    const { title, director, year, color, duration } = req.body;
+  
+    database
+      .query(
+        "INSERT INTO users(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
+        [title, director, year, color, duration]
+      )
+      .then(([result]) => {
+        res.location(`/api/users/${result.insertId}`).sendStatus(201);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error saving the user");
+      });
+  };
   
   module.exports = {
     getUsers,
     getUserById,
+    postUser, 
   };
