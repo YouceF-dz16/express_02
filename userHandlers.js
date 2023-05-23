@@ -1,8 +1,29 @@
 const database = require("./database");
-
+/*
 const getUsers = (req, res) => {
     database
       .query("select * from users")
+      .then(([users]) => {
+        res.json(users);
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send("Error retrieving data from database");
+      });
+  };
+  */
+  const getUsers = (req, res) => {
+    let sql = "select * from users";
+    const language = req.query.language;
+    const city = req.query.city;
+    if (language) {
+      sql += ` where language = '${language}'`;
+    }
+    if (city) {
+      sql += `${language ? ' and' : ' where'} city = '${city}'`;
+    }
+    database
+      .query(sql)
       .then(([users]) => {
         res.json(users);
       })
@@ -85,6 +106,9 @@ const getUsers = (req, res) => {
         res.status(500).send("Error deleting the user");
       });
   };
+
+  
+  
 
   module.exports = {
     getUsers,
