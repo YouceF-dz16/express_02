@@ -51,12 +51,12 @@ const getUsers = (req, res) => {
       });
   };
   const postUser = (req, res) => {
-    const { title, director, year, color, duration } = req.body;
+    const { firstname, lastname, email, city, language} = req.body;
   
     database
       .query(
         "INSERT INTO users(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
-        [title, director, year, color, duration]
+        [firstname, lastname, email, city, language]
       )
       .then(([result]) => {
         res.location(`/api/users/${result.insertId}`).sendStatus(201);
@@ -69,12 +69,12 @@ const getUsers = (req, res) => {
   
   const updateUser = (req, res) => {
     const id = parseInt(req.params.id);
-    const { title, director, year, color, duration } = req.body;
+    const { firstname, lastname, email, city, language } = req.body;
   
     database
       .query(
         "update Users set title = ?, director = ?, year = ?, color = ?, duration = ? where id = ?",
-        [title, director, year, color, duration, id]
+        [firstname, lastname, email, city, language, id]
       )
       .then(([result]) => {
         if (result.affectedRows === 0) {
