@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 
-const port = process.env.APP_PORT ??5050;
+const port = process.env.APP_PORT ?? 5050;
 
 const welcome = (req, res) => {
   res.send("Welcome to my favourite movie list");
@@ -32,3 +32,7 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
+const { hashPassword } = require("./userHandlers");
+
+app.post("/api/users", hashPassword, userHandlers.postUser);
+app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
