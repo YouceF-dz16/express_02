@@ -106,6 +106,19 @@ const deleteUser = (req, res) => {
       res.status(500).send("Error deleting the user");
     });
 };
+const hashPassword = async (req, res, next) => {
+  try {
+    const { password } = req.body;
+    if (password) {
+      const hashedPassword = await argon2.hash(password, hashingOptions);
+      req.body.password = hashedPassword;
+    }
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error hashing the password");
+  }
+};
 
 module.exports = {
   getUsers,
@@ -113,4 +126,5 @@ module.exports = {
   postUser,
   updateUser,
   deleteUser,
+  hashPassword,
 };
