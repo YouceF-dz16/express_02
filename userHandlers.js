@@ -3,13 +3,29 @@ const database = require("./database");
 
 const hashingOptions = {
   type: argon2.argon2id,
-  memoryCost: 15 * 2 ** 20,
+  memoryCost: 2 ** 16,
   timeCost: 2,
   parallelism: 1,
 };
 
+const hashPassword = async (req, res, next) => {
+  const { password } = req.body;
+  try {
+    if (password) {
+      const hashedPassword = await argon2.hash(password, hashingOptions);
+      req.body.hashedPassword = hashedPassword;
+      delete req.body.password;
+      next();
+    }
+  } catch (err) {
+    console.error("oups, une erreur:" + err);
+    res.send("Oups, le back a planté, l'erreur:" + err.message);
+  }
+};
+
 const getUsers = (req, res) => {
-  let sql = "select id, firstname, lastname, email, city, language from users";
+  let sql =
+    "select id, firstname, lastname, email, city, language, hashedPassword from users";
   const language = req.query.language;
   const city = req.query.city;
   if (language) {
@@ -52,18 +68,17 @@ const getUserById = (req, res) => {
 
 const postUser = async (req, res) => {
   try {
-    const { firstname, lastname, email, city, language, password } = req.body;
-    const hashedPassword = await argon2.hash(password, hashingOptions);
-
+    const { firstname, lastname, email, city, language, hashedPassword } =
+      req.body;
     await database.query(
-      "INSERT INTO users(firstname, lastname, email, city, language, password) VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users(firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)",
       [firstname, lastname, email, city, language, hashedPassword]
     );
 
-    res.sendStatus(201);
+    res.status(201).send("user add");
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error saving the user");
+    res.status(500).send("Oups, le server a un problème: " + err.message);
   }
 };
 
@@ -74,7 +89,7 @@ const updateUser = async (req, res) => {
     const hashedPassword = await argon2.hash(password, hashingOptions);
 
     const result = await database.query(
-      "update Users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, password = ? where id = ?",
+      "update Users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? where id = ?",
       [firstname, lastname, email, city, language, hashedPassword, id]
     );
 
@@ -105,19 +120,6 @@ const deleteUser = (req, res) => {
       console.error(err);
       res.status(500).send("Error deleting the user");
     });
-};
-const hashPassword = async (req, res, next) => {
-  try {
-    const { password } = req.body;
-    if (password) {
-      const hashedPassword = await argon2.hash(password, hashingOptions);
-      req.body.password = hashedPassword;
-    }
-    next();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error hashing the password");
-  }
 };
 
 module.exports = {
