@@ -19,10 +19,11 @@ app.put("/api/movies/:id", movieHandlers.updateMovie);
 app.delete("/api/movies/:id", movieHandlers.deleteMovie);
 
 const userHandlers = require("./userHandlers");
+const { hashPassword } = require("./userHandlers");
 app.get("/api/users", userHandlers.getUsers);
 app.get("/api/users/:id", userHandlers.getUserById);
-app.post("/api/users", userHandlers.postUser);
-app.put("/api/users/:id", userHandlers.updateUser);
+app.post("/api/users", hashPassword, userHandlers.postUser);
+app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
 app.delete("/api/users/:id", userHandlers.deleteUser);
 
 app.listen(port, (err) => {
@@ -32,7 +33,3 @@ app.listen(port, (err) => {
     console.log(`Server is listening on ${port}`);
   }
 });
-const { hashPassword } = require("./userHandlers");
-
-app.post("/api/users", hashPassword, userHandlers.postUser);
-app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
