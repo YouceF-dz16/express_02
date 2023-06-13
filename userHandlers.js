@@ -1,27 +1,4 @@
-const argon2 = require("argon2");
 const database = require("./database");
-
-const hashingOptions = {
-  type: argon2.argon2id,
-  memoryCost: 2 ** 16,
-  timeCost: 2,
-  parallelism: 1,
-};
-
-const hashPassword = async (req, res, next) => {
-  const { password } = req.body;
-  try {
-    if (password) {
-      const hashedPassword = await argon2.hash(password, hashingOptions);
-      req.body.hashedPassword = hashedPassword;
-      delete req.body.password;
-      next();
-    }
-  } catch (err) {
-    console.error("oups, une erreur:" + err);
-    res.send("Oups, le back a planté, l'erreur:" + err.message);
-  }
-};
 
 const getUsers = (req, res) => {
   let sql =
@@ -85,18 +62,18 @@ const postUser = async (req, res) => {
 const updateUser = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    const { firstname, lastname, email, city, language, password } = req.body;
-    const hashedPassword = await argon2.hash(password, hashingOptions);
+    const { firstname, lastname, email, city, language, hashedPassword } =
+      req.body;
 
     const result = await database.query(
-      "update Users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? where id = ?",
+      "update users set firstname = ?, lastname = ?, email = ?, city = ?, language = ?, hashedPassword = ? where id = ?",
       [firstname, lastname, email, city, language, hashedPassword, id]
     );
 
     if (result.affectedRows === 0) {
       res.status(404).send("Not Found");
     } else {
-      res.sendStatus(204);
+      res.status(204).send("User updated");
     }
   } catch (err) {
     console.error(err);
@@ -128,5 +105,4 @@ module.exports = {
   postUser,
   updateUser,
   deleteUser,
-  hashPassword,
 };

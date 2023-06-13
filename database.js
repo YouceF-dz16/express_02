@@ -1,11 +1,11 @@
 require("dotenv").config();
 
 const mysql = require("mysql2/promise");
-const port = process.env.DB_PORT ??3306;
+const port = process.env.DB_PORT ?? 3306;
 
 const database = mysql.createPool({
-  host: process.env.DB_HOST, 
-  port: port, 
+  host: process.env.DB_HOST,
+  port: port,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -18,7 +18,7 @@ database
   .catch((err) => {
     console.error(err);
   });
-  database
+database
   .query("select * from movies")
   .then((result) => {
     console.log(result);
@@ -26,7 +26,7 @@ database
   .catch((err) => {
     console.error(err);
   });
-  database
+database
   .query("select * from movies")
   .then(([movies]) => {
     console.log(movies);
@@ -34,8 +34,8 @@ database
   .catch((err) => {
     console.error(err);
   });
-  //users
-  database
+//users
+database
   .query("select * from users")
   .then((result) => {
     console.log(result);
@@ -43,7 +43,7 @@ database
   .catch((err) => {
     console.error(err);
   });
-  database
+database
   .query("select * from users")
   .then(([users]) => {
     console.log(users);
@@ -52,4 +52,4 @@ database
     console.error(err);
   });
 
-module.exports= database;
+module.exports = database;
