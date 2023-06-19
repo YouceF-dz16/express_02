@@ -18,6 +18,8 @@ app.get("/api/movies/:id", movieHandlers.getMovieById);
 const { hashPassword, verifyPassword, verifyToken } = require("./auth");
 
 const userHandlers = require("./userHandlers");
+app.get("/api/users", userHandlers.getUsers);
+app.get("/api/users/:id", userHandlers.getUserById);
 app.post("/api/users", hashPassword, userHandlers.postUser);
 app.post(
   "/api/login",
@@ -51,8 +53,6 @@ app.post("/api/movies", verifyToken, movieHandlers.postMovie);
 app.put("/api/movies/:id", verifyToken, movieHandlers.updateMovie);
 app.delete("/api/movies/:id", verifyToken, movieHandlers.deleteMovie);
 
-app.get("/api/users", userHandlers.getUsers);
-app.get("/api/users/:id", userHandlers.getUserById);
 app.put("/api/users/:id", hashPassword, userHandlers.updateUser);
 app.delete("/api/users/:id", userHandlers.deleteUser);
 
